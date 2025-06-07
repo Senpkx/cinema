@@ -1,6 +1,6 @@
 import type { IEndpoints } from "../interface/endpointsInterface";
 
-export const extractFromInput = (name: string): IEndpoints | undefined => {
+export const extractFromInput = (name: string): IEndpoints => {
   const lastElem = Number(name.slice(-4));
   if (!isNaN(lastElem)) {
     return {

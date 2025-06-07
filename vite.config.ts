@@ -3,5 +3,9 @@ import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/your-repo-name/", // Для пользовательских доменов оставьте '/'
+  plugins: [react()],
+  base: "/",
+  server: {
+    open: true, // Автоматически открывать браузер
+  },
 });
