@@ -1,10 +1,17 @@
-import type { FC } from "react";
-import { getMoviesList } from "../../../service/axios";
+import { useCallback, type FC } from "react";
+import { getMovies } from "../../../service/axios";
 import style from "./header.module.scss";
 import { Search } from "./search/search";
 import { useMovieList } from "../../../hooks/MovieListContex";
 import { Popcorn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  getByLocalStorage,
+  setToLocalStorage,
+} from "../../../service/localstorage";
+import type { ApiResponse } from "../../../interface/apiResponse";
+import type { MovieData } from "../../../interface/movieData";
+import type { filteredData } from "../../../interface/movieData";
 
 export const Header: FC = () => {
   const { isActive, setIsActive, setMoviesList } = useMovieList();
@@ -16,23 +23,47 @@ export const Header: FC = () => {
     { path: "tv-show", name: "TV show" },
   ];
 
-  const handleClick = async (list: string): Promise<void> => {
-    try {
-      const response = await getMoviesList(list);
-      setMoviesList(response.data);
-      setIsActive(list);
-      navigate("list");
+  const handleClick = useCallback(
+    async (list: string) => {
+      try {
+        const cached = getByLocalStorage(list);
+        if (cached) {
+          setMoviesList(cached);
+          setIsActive(list);
+          navigate(`list/${list}`);
+          return;
+        }
+        const response = await getMovies<ApiResponse<MovieData[]>>({
+          list,
+        });
 
-      return;
-    } catch (error) {}
-  };
+        const filteredData: filteredData[] = response.data.map((item) => ({
+          age_restrictions: item.age_restrictions,
+          poster: item.poster,
+          name: item.name,
+          genre: item.genre,
+          year: item.year,
+          rating_imdb: item.rating_imdb,
+          token_movie: item.token_movie,
+        }));
+
+        setToLocalStorage({ key: list, value: filteredData });
+        setMoviesList(response.data);
+        setIsActive(list);
+        navigate(`list/${list}`);
+      } catch (error) {
+        console.error("Ошибка при загрузке списка:", error);
+      }
+    },
+    [navigate]
+  );
+
   return (
     <div className={style.container}>
       <Link
         to="/"
         onClick={() => {
           setIsActive("");
-          setMoviesList([]);
         }}
       >
         <Popcorn className={style.logo} />
@@ -52,7 +83,7 @@ export const Header: FC = () => {
                     : style.link
                 }
               >
-                <Link to={"list"}>{item.name}</Link>
+                <button>{item.name}</button>
               </li>
             ))}
           </ul>

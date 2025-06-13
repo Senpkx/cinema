@@ -15,15 +15,15 @@ export const Search: FC = () => {
   const { setMovieData } = useMovieList();
 
   const handleClick = async (): Promise<void> => {
-    navigate("movie");
-
     try {
       const response = await handleButton({ setError, inputValue });
       if (!response) {
         setError("Нет данных");
         return;
       }
+      console.log(response);
       setMovieData(response);
+      navigate(`movie/${inputValue.name}`);
       setInputValue({ name: "" });
     } catch (error) {
       console.log(error);

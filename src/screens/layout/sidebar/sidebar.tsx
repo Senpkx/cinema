@@ -1,8 +1,14 @@
-import type { FC } from "react";
+import { useCallback, type FC } from "react";
 import style from "./sidebar.module.scss";
-import { getMoviesByGenre } from "../../../service/axios";
+import { getMovies } from "../../../service/axios";
 import { useMovieList } from "../../../hooks/MovieListContex";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  getByLocalStorage,
+  setToLocalStorage,
+} from "../../../service/localstorage";
+import type { ApiResponse } from "../../../interface/apiResponse";
+import type { filteredData, MovieData } from "../../../interface/movieData";
 
 export const Sidebar: FC = () => {
   const { setIsActive, isActive, setMoviesList } = useMovieList();
@@ -40,20 +46,41 @@ export const Sidebar: FC = () => {
     "фильм-нуар",
     "фэнтези",
     "церемония",
-    "uhd/4k",
+    "uhd|4k",
     "2025",
   ];
 
-  const handleClick = async (selectGenre: string): Promise<void> => {
-    try {
-      const response = await getMoviesByGenre(selectGenre);
-      setMoviesList(response.data);
-      setIsActive(selectGenre);
-      navigate("list");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const handleClick = useCallback(
+    async (genre: string): Promise<void> => {
+      try {
+        const cache = getByLocalStorage(genre);
+        if (cache) {
+          setMoviesList(cache);
+          setIsActive(genre);
+          navigate(`list/${genre}`);
+          return;
+        }
+
+        const response = await getMovies<ApiResponse<MovieData[]>>({ genre });
+        const filteredData: filteredData[] = response.data.map((item) => ({
+          age_restrictions: item.age_restrictions,
+          poster: item.poster,
+          name: item.name,
+          genre: item.genre,
+          year: item.year,
+          rating_imdb: item.rating_imdb,
+          token_movie: item.token_movie,
+        }));
+
+        setToLocalStorage({ key: genre, value: filteredData });
+        setIsActive(genre);
+        setMoviesList(response.data);
+        navigate(`list/${genre}`);
+      } catch (error) {}
+    },
+
+    [navigate]
+  );
   return (
     <aside className={style.aside}>
       <nav>
@@ -71,7 +98,7 @@ export const Sidebar: FC = () => {
                 handleClick(genre);
               }}
             >
-              <Link to="list">{genre}</Link>
+              <button>{genre}</button>
             </li>
           ))}
         </ul>

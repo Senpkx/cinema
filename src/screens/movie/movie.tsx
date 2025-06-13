@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useMovieList } from "../../hooks/MovieListContex";
 import style from "./movies.module.scss";
 
-export const Movie: FC = () => {
+const Movie: FC = () => {
   const { movieData } = useMovieList();
 
   return (
@@ -12,7 +12,7 @@ export const Movie: FC = () => {
           <div className={style.movie_info}>
             <img
               className={style.poster}
-              src={movieData.poster || "./not found.png"}
+              src={movieData.poster || "/not-found.webp"}
               alt=""
             />
             <div className={style.main_info}>
@@ -62,3 +62,5 @@ export const Movie: FC = () => {
     </div>
   );
 };
+
+export default Movie;

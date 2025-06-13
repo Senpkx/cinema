@@ -1,25 +1,25 @@
 import { createContext, useContext, useState, type FC } from "react";
-import type { MovieData } from "../interface/movieData";
+import type { filteredData } from "../interface/movieData";
 import type { IChildrenProps } from "../interface/endpointsInterface";
 
 interface IMovieContextType {
-  moviesList: MovieData[];
-  setMoviesList: (movies: MovieData[]) => void;
+  moviesList: filteredData[];
+  setMoviesList: (movies: filteredData[]) => void;
 
   isActive: string;
   setIsActive: (isActive: string) => void;
 
-  movieData: MovieData | null;
-  setMovieData: (movieData: MovieData) => void;
+  movieData: filteredData | null;
+  setMovieData: (movieData: filteredData) => void;
 }
 const MovieListContext = createContext<IMovieContextType | undefined>(
   undefined
 );
 
 export const MovieProvider: FC<IChildrenProps> = ({ children }) => {
-  const [moviesList, setMoviesList] = useState<MovieData[]>([]);
+  const [moviesList, setMoviesList] = useState<filteredData[]>([]);
   const [isActive, setIsActive] = useState<string>("");
-  const [movieData, setMovieData] = useState<MovieData | null>(null);
+  const [movieData, setMovieData] = useState<filteredData | null>(null);
   return (
     <MovieListContext
       value={{

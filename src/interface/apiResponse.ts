@@ -1,6 +1,6 @@
-import type { MovieData } from "./movieData";
-
-export interface ApiResponse {
+export interface ApiResponse<T> {
   status: string;
-  data: MovieData;
+  data: T;
+  next_page?: number;
+  prev_page?: number | null;
 }

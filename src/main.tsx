@@ -1,12 +1,14 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import "./global.scss";
-import { Layout } from "./screens/layout/layout";
-import { MovieList } from "./screens/movieList/movieList";
-import { MovieProvider } from "./hooks/MovieListContex";
+import { lazy } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Movie } from "./screens/movie/movie";
-import { Home } from "./screens/home/home";
+import { MovieProvider } from "./hooks/MovieListContex";
+import { createRoot } from "react-dom/client";
+
+const Layout = lazy(() => import("./screens/layout/layout"));
+const MovieList = lazy(() => import("./screens/movieList/movieList"));
+const Movie = lazy(() => import("./screens/movie/movie"));
+const Home = lazy(() => import("./screens/home/home"));
 
 const router = createBrowserRouter([
   {
@@ -18,15 +20,15 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/",
+        index: true,
         element: <Home />,
       },
       {
-        path: "list",
+        path: "list/:list",
         element: <MovieList />,
       },
       {
-        path: "movie",
+        path: "movie/:id",
         element: <Movie />,
       },
     ],

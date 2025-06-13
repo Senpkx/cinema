@@ -1,22 +1,30 @@
-import type { FC } from "react";
+import { useCallback, type FC } from "react";
 import { useMovieList } from "../../hooks/MovieListContex";
 import style from "./movieList.module.scss";
-import { getMovieByToken } from "../../service/axios";
+// import { getMovieByToken } from "../../service/axios";
 import { useNavigate } from "react-router-dom";
+import { getMovies } from "../../service/axios";
+import type { ApiResponse } from "../../interface/apiResponse";
+import type { MovieData } from "../../interface/movieData";
 
-export const MovieList: FC = () => {
-  const { moviesList, setMovieData } = useMovieList();
+const MovieList: FC = () => {
+  const { moviesList, setMovieData, setIsActive } = useMovieList();
   const navigate = useNavigate();
-
-  const handleClick = async (movie_id: string): Promise<void> => {
-    try {
-      const response = await getMovieByToken(movie_id);
-      setMovieData(response.data);
-      navigate("/movie");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const handleClick = useCallback(
+    async (id: string | undefined): Promise<void> => {
+      try {
+        const response = await getMovies<ApiResponse<MovieData>>({
+          token_movie: id,
+        });
+        setMovieData(response.data);
+        navigate(`/movie/${id}`);
+        setIsActive("");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [navigate]
+  );
 
   return (
     <div className={style.container}>
@@ -33,7 +41,7 @@ export const MovieList: FC = () => {
             {item.poster ? (
               <img className={style.poster} src={item.poster} alt="" />
             ) : (
-              <img className={style.notfound} src="./not found.png" alt="" />
+              <img className={style.notfound} src="/not-found.webp" alt="" />
             )}
             <div className={style.info}>
               <div className={style.name}>{item.name}</div>
@@ -54,3 +62,4 @@ export const MovieList: FC = () => {
     </div>
   );
 };
+export default MovieList;

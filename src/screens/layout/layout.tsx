@@ -1,10 +1,10 @@
-import type { FC } from "react";
+import { Suspense, type FC } from "react";
 import { Sidebar } from "./sidebar/sidebar";
 import { Header } from "./header/header";
 import style from "./layout.module.scss";
 import { Outlet } from "react-router-dom";
 
-export const Layout: FC = () => {
+const Layout: FC = () => {
   return (
     <>
       <Header />
@@ -13,9 +13,13 @@ export const Layout: FC = () => {
           <Sidebar />
         </div>
         <div className={style.content}>
-          <Outlet />
+          <Suspense fallback={<>loading....</>}>
+            <Outlet />
+          </Suspense>
         </div>
       </div>
     </>
   );
 };
+
+export default Layout;
