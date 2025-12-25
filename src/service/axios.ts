@@ -2,7 +2,7 @@ import axios from "axios";
 import type { params } from "../interface/endpointsInterface";
 
 export const AxiosBase = axios.create({
-  baseURL: "https://api.alloha.tv",
+  baseURL: "https://api.apbugall.org",
   timeout: 10000,
   params: { token: "04941a9a3ca3ac16e2b4327347bbc1" },
 });
